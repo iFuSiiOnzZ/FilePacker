@@ -49,12 +49,31 @@ bool ArgsParser(int argc, char *argv[], char *l_pFileO, char *l_pFolder, char *l
 
 int main(int argc, char *argv[])
 {
+    HANDLE l_pConsoleH = GetStdHandle(STD_OUTPUT_HANDLE);
+    if(l_pConsoleH)
+    {
+        COORD l_ConsoleC = { 0 };
+        COORD largestSize = GetLargestConsoleWindowSize(l_pConsoleH);
+
+        l_ConsoleC.X = (short) largestSize.X - 10;
+        l_ConsoleC.Y = (short) 500;
+
+        if(SetConsoleScreenBufferSize(l_pConsoleH, l_ConsoleC))
+        {
+            SMALL_RECT l_sRect = { 0 };
+            l_sRect.Right = l_ConsoleC.X - 1;
+            l_sRect.Bottom = 24;
+            SetConsoleWindowInfo(l_pConsoleH, TRUE, &l_sRect);
+        }
+    }
+
     if((argc == 2 && !strcmp(argv[1], "-v")) || argc == 1) 
     {
         Help();
+        system("pause");
         return EXIT_SUCCESS;
     }
-    
+
     char l_pFileO[MAX_PATH] = { 0 };
     char l_pFolder[MAX_PATH] = { 0 };
 
@@ -62,12 +81,13 @@ int main(int argc, char *argv[])
     if(!ArgsParser(argc, argv, l_pFileO, l_pFolder, l_pOption))
     {
         Help();
+        system("pause");
         return EXIT_SUCCESS;
     }
 
     FILE *l_pFile = NULL;
     S_PDIRDATA t = NULL;
-    
+
     if(!strcmp(l_pOption, "pack"))
     {
         t = ListDir(l_pFolder);
@@ -83,13 +103,12 @@ int main(int argc, char *argv[])
     else
     {
         Help();
+        system("pause");
         return EXIT_SUCCESS;
     }
 
     fclose(l_pFile);
     DeleteDirData(t);
-
-    printf("\n");
 
     system("pause");
     return EXIT_SUCCESS;

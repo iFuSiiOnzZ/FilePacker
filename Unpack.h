@@ -22,6 +22,36 @@ bool FolderExists(const char* l_pFolder)
     return false;
 }
 
+char *strFileSize2(unsigned int l_iFileSize, char *l_pBExt, unsigned int l_iStrSize)
+{
+    char l_pSize[256] = { 0 }; 
+    sprintf_s(l_pSize, "%d", l_iFileSize);
+    sprintf_s(l_pBExt, l_iStrSize, "%5s KB", l_pSize);
+
+    if(l_iFileSize > 1024)
+    {
+        l_iFileSize /= 1024;
+        sprintf_s(l_pSize, "%d", l_iFileSize);
+        sprintf_s(l_pBExt, l_iStrSize, "%5s KB", l_pSize);
+    }
+
+    if(l_iFileSize > 1024)
+    {
+        l_iFileSize /= 1024;
+        sprintf_s(l_pSize, "%d", l_iFileSize);
+        sprintf_s(l_pBExt, l_iStrSize, "%5s MB", l_pSize);
+    }
+
+    if(l_iFileSize > 1024)
+    {
+        l_iFileSize /= 1024;
+        sprintf_s(l_pSize, "%d", l_iFileSize);
+        sprintf_s(l_pBExt, l_iStrSize, "%5s GB", l_pSize);
+    }
+
+    return l_pBExt;
+}
+
 S_PFILEDATA UnpackFiles(FILE *l_pFile, unsigned int l_NumFiles, char *l_pFolder)
 {
     if(!l_NumFiles) return NULL;
@@ -30,6 +60,7 @@ S_PFILEDATA UnpackFiles(FILE *l_pFile, unsigned int l_NumFiles, char *l_pFolder)
     memset(l_pFileData, 0, sizeof(S_FILEDATA));
     S_PFILEDATA l_pFileCurrent = l_pFileData;
 
+    char l_pBExt[32] = { 0 };
     for(unsigned int i = 0; i < l_NumFiles; i++)
     {
         fread(l_pFileCurrent->Name, sizeof(char), MAX_PATH, l_pFile);
@@ -37,9 +68,7 @@ S_PFILEDATA UnpackFiles(FILE *l_pFile, unsigned int l_NumFiles, char *l_pFolder)
 
         char l_pUnpackPath[256] = { 0 };
         sprintf_s(l_pUnpackPath, "%s\\%s", l_pFolder, l_pFileCurrent->Name);
-
-        char l_pSize[256] = { 0 }; sprintf_s(l_pSize, "%d", l_pFileCurrent->FileSize);
-        printf("Unpacking: (%16s B) %50s  ...", l_pSize, l_pUnpackPath);
+        printf("Unpacking: (%s) %160s %5s", strFileSize2(l_pFileCurrent->FileSize, l_pBExt, 32), l_pUnpackPath, "...");
 
       
         char l_pBuffer[1024] = { 0 };
@@ -60,7 +89,7 @@ S_PFILEDATA UnpackFiles(FILE *l_pFile, unsigned int l_NumFiles, char *l_pFolder)
         fwrite(l_pBuffer, 1, r, l_pFile2Write);
 
         fclose(l_pFile2Write);
-        printf("\t\t OK\n");
+        printf("\t\t DONE\n");
 
         l_pFileCurrent->Next = (S_PFILEDATA) malloc (sizeof(S_FILEDATA));
         memset(l_pFileCurrent->Next, 0, sizeof(S_FILEDATA));

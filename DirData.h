@@ -7,12 +7,6 @@
 #define CHECKED_DELETE(x)       { if(x != NULL){ delete x; x = NULL; } }
 #define CHECKED_DELETE_ARRAY(x) { if(x != NULL){ delete [] x; x = NULL; } }
 
-typedef enum DATATYPE
-{ 
-    TYPE_FILE, 
-    TYPE_FOLDER 
-} E_DATATYPE, *E_PDATATYPE;
-
 typedef struct FILEDATA
 {
     char Name[MAX_PATH];
