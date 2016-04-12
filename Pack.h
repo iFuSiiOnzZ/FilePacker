@@ -57,11 +57,11 @@ void PackFile(S_PFILEDATA l_pFileData, FILE *l_pFile, unsigned int l_NumFiles)
         fopen_s(&l_pFile2Read, l_pFileData->Name, "rb");
 
         char l_pBuffer[1024] = { 0 };
-        unsigned int r = 0, w = 0;
+        size_t r = 0, w = 0;
 
         while(!feof(l_pFile2Read))
         {
-            unsigned int l = fread(l_pBuffer, sizeof(char), 1024, l_pFile2Read);
+            size_t l = fread(l_pBuffer, sizeof(char), 1024, l_pFile2Read);
             w += fwrite(l_pBuffer, sizeof(char), l, l_pFile);
             r += l;
         }

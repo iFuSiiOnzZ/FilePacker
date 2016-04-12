@@ -72,7 +72,7 @@ S_PFILEDATA UnpackFiles(FILE *l_pFile, unsigned int l_NumFiles, char *l_pFolder)
 
       
         char l_pBuffer[1024] = { 0 };
-        unsigned int l_BytesReaded = 0;
+        size_t l_BytesReaded = 0;
         unsigned int l_BytesToRead = 1024 > l_pFileCurrent->FileSize ? l_pFileCurrent->FileSize : 1024;
 
         FILE *l_pFile2Write = NULL;
@@ -80,12 +80,12 @@ S_PFILEDATA UnpackFiles(FILE *l_pFile, unsigned int l_NumFiles, char *l_pFolder)
 
         while(l_BytesReaded < l_pFileCurrent->FileSize && l_BytesToRead < l_pFileCurrent->FileSize - l_BytesReaded)
         {
-            unsigned int r = fread(l_pBuffer, 1, l_BytesToRead, l_pFile);
+            size_t r = fread(l_pBuffer, 1, l_BytesToRead, l_pFile);
             fwrite(l_pBuffer, 1, r, l_pFile2Write);
             l_BytesReaded += r;
         }
 
-        unsigned int r = fread(l_pBuffer, 1, l_pFileCurrent->FileSize - l_BytesReaded, l_pFile);
+        size_t r = fread(l_pBuffer, 1, l_pFileCurrent->FileSize - l_BytesReaded, l_pFile);
         fwrite(l_pBuffer, 1, r, l_pFile2Write);
 
         fclose(l_pFile2Write);
