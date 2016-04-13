@@ -2,7 +2,8 @@
 #define _READTREE_H_
 
 #include "DirData.h"
-#include <assert.h>
+#include "Common.h"
+
 #include  <io.h>
 
 bool FolderExists(const char* l_pFolder)
@@ -22,35 +23,6 @@ bool FolderExists(const char* l_pFolder)
     return false;
 }
 
-char *strFileSize2(unsigned int l_iFileSize, char *l_pBExt, unsigned int l_iStrSize)
-{
-    char l_pSize[256] = { 0 }; 
-    sprintf_s(l_pSize, "%d", l_iFileSize);
-    sprintf_s(l_pBExt, l_iStrSize, "%5s KB", l_pSize);
-
-    if(l_iFileSize > 1024)
-    {
-        l_iFileSize /= 1024;
-        sprintf_s(l_pSize, "%d", l_iFileSize);
-        sprintf_s(l_pBExt, l_iStrSize, "%5s KB", l_pSize);
-    }
-
-    if(l_iFileSize > 1024)
-    {
-        l_iFileSize /= 1024;
-        sprintf_s(l_pSize, "%d", l_iFileSize);
-        sprintf_s(l_pBExt, l_iStrSize, "%5s MB", l_pSize);
-    }
-
-    if(l_iFileSize > 1024)
-    {
-        l_iFileSize /= 1024;
-        sprintf_s(l_pSize, "%d", l_iFileSize);
-        sprintf_s(l_pBExt, l_iStrSize, "%5s GB", l_pSize);
-    }
-
-    return l_pBExt;
-}
 
 S_PFILEDATA UnpackFiles(FILE *l_pFile, unsigned int l_NumFiles, char *l_pFolder)
 {
@@ -68,7 +40,7 @@ S_PFILEDATA UnpackFiles(FILE *l_pFile, unsigned int l_NumFiles, char *l_pFolder)
 
         char l_pUnpackPath[256] = { 0 };
         sprintf_s(l_pUnpackPath, "%s\\%s", l_pFolder, l_pFileCurrent->Name);
-        printf("Unpacking: (%s) %160s %5s", strFileSize2(l_pFileCurrent->FileSize, l_pBExt, 32), l_pUnpackPath, "...");
+        printf("Unpacking: (%s) %160s %5s", strFileSize(l_pFileCurrent->FileSize, l_pBExt, 32), l_pUnpackPath, "...");
 
       
         char l_pBuffer[1024] = { 0 };
