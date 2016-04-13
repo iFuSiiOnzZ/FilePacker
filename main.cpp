@@ -8,13 +8,47 @@
 #include "Unpack.h"
 #include "Pack.h"
 
+#define MIN(a, b) ((a) < (b)) ? (a) : (b)
+#define MAX(a, b) ((a) > (b)) ? (a) : (b)
+
 void Help()
 {
     printf("\n\n");
-    printf("programName -v\n");
-    printf("programName -o pack   -d folder_to_pack   -f output\n");
-    printf("programName -o unpack -d folder_to_unpack -f packdata\n");
+    printf("    programName -v\n");
+    printf("    programName -o pack   -d folder_to_pack   -f output\n");
+    printf("    programName -o unpack -d folder_to_unpack -f packdata\n");
     printf("\n");
+}
+
+void ResizeConsole(int Width, int Height)
+{
+    HANDLE pConsoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (pConsoleHandle == INVALID_HANDLE_VALUE) return;
+
+    CONSOLE_SCREEN_BUFFER_INFO csbi = { 0 };
+    SMALL_RECT srWindowRect = { 0 };
+    COORD coordScreen = { 0 };
+
+    GetConsoleScreenBufferInfo(pConsoleHandle, &csbi);
+    coordScreen = GetLargestConsoleWindowSize(pConsoleHandle);
+
+    srWindowRect.Right  = (SHORT)(MIN(Width, coordScreen.X) - 1);
+    srWindowRect.Bottom = (SHORT)(MIN(Height, coordScreen.Y) - 1);
+
+    coordScreen.X = Width;
+    coordScreen.Y = Height;
+
+    if( (DWORD)csbi.dwSize.X * csbi.dwSize.Y > (DWORD) Width * Height)
+    {
+        SetConsoleWindowInfo(pConsoleHandle, TRUE, &srWindowRect);
+        SetConsoleScreenBufferSize(pConsoleHandle, coordScreen);
+    }
+
+    if( (DWORD)csbi.dwSize.X * csbi.dwSize.Y < (DWORD) Width * Height )
+    {
+        SetConsoleScreenBufferSize(pConsoleHandle, coordScreen);
+        SetConsoleWindowInfo(pConsoleHandle, TRUE, &srWindowRect);
+    }
 }
 
 bool ArgsParser(int argc, char *argv[], char *l_pFileO, char *l_pFolder, char *l_pOption)
@@ -49,23 +83,7 @@ bool ArgsParser(int argc, char *argv[], char *l_pFileO, char *l_pFolder, char *l
 
 int main(int argc, char *argv[])
 {
-    HANDLE l_pConsoleH = GetStdHandle(STD_OUTPUT_HANDLE);
-    if(l_pConsoleH)
-    {
-        COORD l_ConsoleC = { 0 };
-        COORD largestSize = GetLargestConsoleWindowSize(l_pConsoleH);
-
-        l_ConsoleC.X = (short) largestSize.X - 10;
-        l_ConsoleC.Y = (short) 500;
-
-        if(SetConsoleScreenBufferSize(l_pConsoleH, l_ConsoleC))
-        {
-            SMALL_RECT l_sRect = { 0 };
-            l_sRect.Right = l_ConsoleC.X - 1;
-            l_sRect.Bottom = 24;
-            SetConsoleWindowInfo(l_pConsoleH, TRUE, &l_sRect);
-        }
-    }
+    ResizeConsole(200, 30);
 
     if((argc == 2 && !strcmp(argv[1], "-v")) || argc == 1) 
     {
