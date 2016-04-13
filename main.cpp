@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
         t = ListDir(l_pFolder);
 
         fopen_s(&l_pFile, l_pFileO, "wb");
-        PackFolder(t, l_pFile);
+        PackFolder(t, l_pFile, l_pFolder);
     }
     else if(!strcmp(l_pOption, "unpack"))
     {

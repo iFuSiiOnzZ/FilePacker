@@ -42,23 +42,20 @@ void PackFile(S_PFILEDATA l_pFileData, FILE *l_pFile, unsigned int l_NumFiles)
 
 }
 
-void PackFolder(S_PDIRDATA l_pDirData, FILE *l_pFile)
+void PackFolder(S_PDIRDATA l_pDirData, FILE *l_pFile, char *l_pSkipDirEntry = nullptr)
 {
     fwrite(&l_pDirData->NumFiles, sizeof(unsigned int), 1, l_pFile);
     fwrite(&l_pDirData->NumDirs, sizeof(unsigned int), 1, l_pFile);
 
-    char *l_pDirName = strchr(l_pDirData->Name, '\\');
-    char l_pActualDir[4] = "";
-
-    if(!l_pDirName) l_pDirName = l_pActualDir;
-    else l_pDirName++;
+    char l_pDirName[MAX_PATH] = { 0 };
+    sprintf_s(l_pDirName, "%s", l_pDirData->Name + strlen(l_pSkipDirEntry));
 
     fwrite(l_pDirName, sizeof(char), MAX_PATH, l_pFile);
-
     PackFile(l_pDirData->Files, l_pFile, l_pDirData->NumFiles);
+
     for(unsigned int i = 0; i < l_pDirData->NumDirs; i++)
     {
-        PackFolder(l_pDirData->Next[i], l_pFile);
+        PackFolder(l_pDirData->Next[i], l_pFile, l_pSkipDirEntry);
     }
 }
 
